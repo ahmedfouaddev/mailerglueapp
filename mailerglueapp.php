@@ -8,165 +8,183 @@
  * Requires at least: 6.0
  * Requires PHP: 7.0
  * Version: 1.0.0
- * Text Domain: mgapp
+ * Text Domain: mailerglueapp
  * Domain Path: /i18n/languages/
  */
 
 // Exit if accessed directly.
-if (!defined('ABSPATH')) {
-    exit;
-}
+if ( ! defined( 'ABSPATH' ) ) exit;
 
-if (!class_exists('MGApp')) {
+if ( ! class_exists( 'MailerGlueApp' ) ) {
 
 /**
  * Main Class.
  */
-final class MGApp
-{
+final class MailerGlueApp {
 
-    /**
-     * @var Instance.
-     */
-    private static $instance;
+	/**
+	 * @var Instance.
+	 */
+	private static $instance;
 
-    /**
-     * @var Version.
-     */
-    public $version = '1.0.0';
+	/**
+	 * @var $api_version.
+	 */
+	public $api_version = 'v1';
+
+	/**
+	 * @var Version.
+	 */
+	public $version = '1.0.0';
   
-    /**
-     * Main Instance.
-     */
-    public static function instance()
-    {
-        if (!isset(self::$instance) && !(self::$instance instanceof MGApp)) {
-            self::$instance = new MGApp;
-            self::$instance->setupConstants();
+	/**
+	 * Main Instance.
+	 */
+	public static function instance() {
+		if ( ! isset( self::$instance ) && ! ( self::$instance instanceof MailerGlueApp ) ) {
+			self::$instance = new MailerGlueApp;
+			self::$instance->setup_constants();
 
-            add_action('plugins_loaded', array(self::$instance, 'loadTextdomain'));
+			add_action( 'plugins_loaded', array( self::$instance, 'load_text_domain' ) );
 
-            self::$instance->includes();
-        }
+			self::$instance->autoload();
+			self::$instance->includes();
+		}
 
-        return self::$instance;
-    }
+		return self::$instance;
+	}
 
-    /**
-     * Throw error on object clone.
-     */
-    public function __clone()
-    {
-        // Cloning instances of the class is forbidden.
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?', 'mgapp'), $this->version);
-    }
+	/**
+	 * Throw error on object clone.
+	 */
+	public function __clone() {
+		// Cloning instances of the class is forbidden.
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mailerglueapp'), $this->version );
+	}
 
-    /**
-     * Disable unserializing of the class.
-     */
-    public function __wakeup()
-    {
-        // Unserializing instances of the class is forbidden.
-        _doing_it_wrong(__FUNCTION__, __('Cheatin&#8217; huh?', 'mgapp'), $this->version);
-    }
+	/**
+	 * Disable unserializing of the class.
+	 */
+	public function __wakeup() {
+		// Unserializing instances of the class is forbidden.
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mailerglueapp' ), $this->version );
+	}
 
-    /**
-     * Setup plugin constants.
-     */
-    private function setupConstants()
-    {
+	/**
+	 * Setup plugin constants.
+	 */
+	private function setup_constants() {
 
-        // Plugin version.
-        if (!defined('MGAPP_VERSION')) {
-            define('MGAPP_VERSION', $this->version);
-        }
+		// Plugin version.
+		if ( ! defined( 'MAILERGLUEAPP_VERSION' ) ) {
+			define( 'MAILERGLUEAPP_VERSION', $this->version );
+		}
 
-        // Plugin version.
-        if (!defined('MGAPP_API_VERSION')) {
-            define('MGAPP_API_VERSION', '1.0');
-        }
+		// API version.
+		if ( ! defined( 'MAILERGLUEAPP_API_VERSION') ) {
+			define( 'MAILERGLUEAPP_API_VERSION', $this->api_version );
+		}
 
-        // Plugin Folder Path.
-        if (!defined('MGAPP_PLUGIN_DIR')) {
-            define('MGAPP_PLUGIN_DIR', plugin_dir_path(__FILE__));
-        }
+		// Plugin Folder Path.
+		if ( ! defined( 'MAILERGLUEAPP_PLUGIN_DIR' ) ) {
+			define( 'MAILERGLUEAPP_PLUGIN_DIR', plugin_dir_path(__FILE__) );
+		}
 
-        // Plugin Folder URL.
-        if (!defined('MGAPP_PLUGIN_URL')) {
-            define('MGAPP_PLUGIN_URL', plugin_dir_url(__FILE__));
-        }
+		// Plugin Folder URL.
+		if ( ! defined( 'MAILERGLUEAPP_PLUGIN_URL' ) ) {
+			define( 'MAILERGLUEAPP_PLUGIN_URL', plugin_dir_url(__FILE__) );
+		}
 
-        // Plugin Root File.
-        if (!defined('MGAPP_PLUGIN_FILE')) {
-            define('MGAPP_PLUGIN_FILE', __FILE__);
-        }
+		// Plugin Root File.
+		if ( ! defined( 'MAILERGLUEAPP_PLUGIN_FILE' ) ) {
+			define( 'MAILERGLUEAPP_PLUGIN_FILE', __FILE__ );
+		}
 
-    }
+	}
 
-    /**
-     * Include required files.
-     */
-    private function includes()
-    {
+	/**
+	 * Autoload.
+	 */
+	private function autoload() {
+		spl_autoload_register( array( $this, 'autoloader' ) );
+	}
 
-        if (is_admin() || (defined('WP_CLI') && WP_CLI)) {
-            $this->loadTextdomain();
-        }
+	/**
+	 * Includes.
+	 */
+	public function includes() {
 
-    }
+		$this->install	= new MailerGlueApp\Install();
+		$this->api		= new MailerGlueApp\API();
 
-    /**
-     * Loads the plugin language files.
-     */
-    public function loadTextdomain()
-    {
-        global $wp_version;
+	}
 
-        // Set filter for plugin's languages directory.
-        $mgappLangDir  = dirname(plugin_basename(MGAPP_PLUGIN_FILE)) . '/i18n/languages/';
-        $mgappLangDir  = apply_filters('mgapp_languages_directory', $mgappLangDir);
+	/**
+	 * @param $class
+	 */
+	public function autoloader( $classname ) {
+		$classname = ltrim( $classname, '\\' );
+		$classname = str_replace( __NAMESPACE__, '', $classname );
+		$classname = str_replace( '\\', '/', $classname );
+		$classname = str_replace( 'MailerGlueApp/', '', $classname );
 
-        // Traditional WordPress plugin locale filter.
+		$path = MAILERGLUEAPP_PLUGIN_DIR . 'includes/classes/' . strtolower( $classname ) . '.php';
+		if ( file_exists( $path ) ) {
+			include_once $path;
+		}
+	}
 
-        $getLocale = get_locale();
+	/**
+	 * Loads the plugin language files.
+	 */
+	public function load_text_domain() {
+		global $wp_version;
 
-        if ($wp_version >= 4.7) {
+		// Set filter for plugin's languages directory.
+		$languages_dir	= dirname( plugin_basename( MAILERGLUEAPP_PLUGIN_FILE ) ) . '/i18n/languages/';
+		$languages_dir	= apply_filters( 'mailerglueapp_languages_directory', $languages_dir );
 
-            $getLocale = get_user_locale();
-        }
+		// Traditional WordPress plugin locale filter.
 
-        unload_textdomain('mgapp');
+		$get_locale = get_locale();
 
-        /**
-         * Defines the plugin language locale used.
-         *
-         * @var $getLocale The locale to use. Uses get_user_locale()` in WordPress 4.7 or greater,
-         *                  otherwise uses `get_locale()`.
-         */
-        $locale        = apply_filters('plugin_locale', $getLocale, 'mgapp');
-        $mofile        = sprintf('%1$s-%2$s.mo', 'mgapp', $locale);
+		if ($wp_version >= 4.7) {
 
-        // Look for wp-content/languages/mgapp/mgapp-{lang}_{country}.mo
-        $mofileGlobal1 = WP_LANG_DIR . '/mgapp/mgapp-' . $locale . '.mo';
+			$get_locale = get_user_locale();
+		}
 
-        // Look in wp-content/languages/plugins/mgapp
-        $mofileGlobal2 = WP_LANG_DIR . '/plugins/mgapp/' . $mofile;
+		unload_textdomain( 'mailerglueapp' );
 
-        if (file_exists($mofileGlobal1)) {
+		/**
+		 * Defines the plugin language locale used.
+		 *
+		 * @var $get_locale The locale to use. Uses get_user_locale()` in WordPress 4.7 or greater,
+		 *					otherwise uses `get_locale()`.
+		 */
+		$locale		   = apply_filters( 'plugin_locale', $get_locale, 'mailerglueapp' );
+		$mofile		   = sprintf( '%1$s-%2$s.mo', 'mailerglueapp', $locale );
 
-            load_textdomain('mgapp', $mofileGlobal1);
+		// Look for wp-content/languages/mailerglueapp/mailerglueapp-{lang}_{country}.mo
+		$mofileglobal1 = WP_LANG_DIR . '/mailerglueapp/mailerglueapp-' . $locale . '.mo';
 
-        } elseif (file_exists($mofileGlobal2)) {
+		// Look in wp-content/languages/plugins/mailerglueapp
+		$mofileglobal2 = WP_LANG_DIR . '/plugins/mailerglueapp/' . $mofile;
 
-            load_textdomain('mgapp', $mofileGlobal2);
+		if ( file_exists( $mofileglobal1 ) ) {
 
-        } else {
+			load_textdomain( 'mailerglueapp', $mofileglobal1 );
 
-            // Load the default language files.
-            load_plugin_textdomain('mgapp', false, $mgappLangDir);
-        }
+		} elseif ( file_exists( $mofileglobal2 ) ) {
 
-    }
+			load_textdomain( 'mailerglueapp', $mofileglobal2 );
+
+		} else {
+
+			// Load the default language files.
+			load_plugin_textdomain( 'mailerglueapp', false, $languages_dir );
+		}
+
+	}
 
 }
 
@@ -175,10 +193,9 @@ final class MGApp
 /**
  * The main function.
  */
-function mgapp()
-{
-    return MGApp::instance();
+function mailerglueapp() {
+	return MailerGlueApp::instance();
 }
 
 // Get Running.
-mgapp();
+mailerglueapp();
