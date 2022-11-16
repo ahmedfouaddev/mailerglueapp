@@ -28,6 +28,9 @@ class GetAccessToken {
 	 */
 	public function response( $request ) {
 
+		$rest = new \MailerGlueApp\API\Log_Request;
+		$rest->insert( $request );
+
 		$email		= $request->get_param( 'email' );
 		$password	= $request->get_param( 'password' );
 

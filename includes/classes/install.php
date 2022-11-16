@@ -138,6 +138,23 @@ class Install {
 		);
 
 		$wpdb->query( $r );
+
+		$r = (
+			"CREATE TABLE IF NOT EXISTS {$this->prefix}requests ( " .
+				'  request_id bigint(20) unsigned NOT NULL auto_increment, ' .
+				'  account_id bigint(20) NOT NULL default "0", ' .
+				'  access_token varchar(255) NOT NULL default "", ' .
+				'  user_agent varchar(255) NOT NULL default "", ' .
+				'  endpoint varchar(255) NOT NULL default "", ' .
+				'  request_url varchar(255) NOT NULL default "", ' .
+				'  request_time datetime NOT NULL default "0000-00-00 00:00:00", ' .
+				'  ip_address varchar(255) NOT NULL default "", ' .
+				'  PRIMARY KEY (request_id) ' .
+				') ' .
+				"$charset_collate;"
+		);
+
+		$wpdb->query( $r );
 	}
 
 	/**
@@ -146,10 +163,10 @@ class Install {
 	public function is_db_installed() {
 		global $wpdb;
 
-		$tables = array( 'lists', 'users', 'subscriptions', 'campaigns' );
+		$tables = array( 'lists', 'users', 'subscriptions', 'campaigns', 'requests' );
 
 		foreach ( $tables as $table ) {
-			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$this->table_prefix}{$table}'") != "{$this->table_prefix}{$table}" ) {
+			if ( $wpdb->get_var( "SHOW TABLES LIKE '{$this->prefix}{$table}'") != "{$this->prefix}{$table}" ) {
 				return false;
 			}
 		}

@@ -59,7 +59,7 @@ final class MailerGlueApp {
 	 */
 	public function __clone() {
 		// Cloning instances of the class is forbidden.
-		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mailerglueapp'), $this->version );
+		_doing_it_wrong( __FUNCTION__, __( 'Cheatin&#8217; huh?', 'mailerglueapp' ), $this->version );
 	}
 
 	/**
@@ -81,7 +81,7 @@ final class MailerGlueApp {
 		}
 
 		// API version.
-		if ( ! defined( 'MAILERGLUEAPP_API_VERSION') ) {
+		if ( ! defined( 'MAILERGLUEAPP_API_VERSION' ) ) {
 			define( 'MAILERGLUEAPP_API_VERSION', $this->api_version );
 		}
 
@@ -123,10 +123,12 @@ final class MailerGlueApp {
 	 * @param $class
 	 */
 	public function autoloader( $classname ) {
+
 		$classname = ltrim( $classname, '\\' );
 		$classname = str_replace( __NAMESPACE__, '', $classname );
 		$classname = str_replace( '\\', '/', $classname );
 		$classname = str_replace( 'MailerGlueApp/', '', $classname );
+		$classname = str_replace( '_', '-', $classname );
 
 		$path = MAILERGLUEAPP_PLUGIN_DIR . 'includes/classes/' . strtolower( $classname ) . '.php';
 		if ( file_exists( $path ) ) {
