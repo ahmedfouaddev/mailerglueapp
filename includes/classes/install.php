@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  */
 class Install {
 
-	private $table_prefix;
+	private $prefix;
 
 	/**
 	 * Construct.
@@ -19,7 +19,7 @@ class Install {
 	{
 		global $wpdb;
 
-		$this->table_prefix = $wpdb->prefix . 'mailerglueapp_';
+		$this->prefix = $wpdb->prefix . 'mailerglueapp_';
 
 		register_activation_hook( MAILERGLUEAPP_PLUGIN_FILE, array( $this, 'pre_install' ), 10 );
 	}
@@ -66,7 +66,7 @@ class Install {
 		$charset_collate = $wpdb->get_charset_collate();
 
 		$r = (
-			"CREATE TABLE IF NOT EXISTS {$this->table_prefix}lists ( " .
+			"CREATE TABLE IF NOT EXISTS {$this->prefix}lists ( " .
 				'  list_id bigint(20) unsigned NOT NULL auto_increment, ' .
 				'  account_id bigint(20) NOT NULL default "0", ' .
 				'  name varchar(255) NOT NULL default "", ' .
@@ -80,7 +80,7 @@ class Install {
 		$wpdb->query( $r );
 
 		$r = (
-			"CREATE TABLE IF NOT EXISTS {$this->table_prefix}users ( " .
+			"CREATE TABLE IF NOT EXISTS {$this->prefix}users ( " .
 				'  user_id bigint(20) unsigned NOT NULL auto_increment, ' .
 				'  account_id bigint(20) NOT NULL default "0", ' .
 				'  wp_user_id bigint(20) NOT NULL default "0", ' .
@@ -98,7 +98,7 @@ class Install {
 		$wpdb->query( $r );
 
 		$r = (
-			"CREATE TABLE IF NOT EXISTS {$this->table_prefix}subscriptions ( " .
+			"CREATE TABLE IF NOT EXISTS {$this->prefix}subscriptions ( " .
 				'  subscription_id bigint(20) unsigned NOT NULL auto_increment, ' .
 				'  account_id bigint(20) NOT NULL default "0", ' .
 				'  user_id bigint(20) NOT NULL default "0", ' .
@@ -116,7 +116,7 @@ class Install {
 		$wpdb->query( $r );
 
 		$r = (
-			"CREATE TABLE IF NOT EXISTS {$this->table_prefix}campaigns ( " .
+			"CREATE TABLE IF NOT EXISTS {$this->prefix}campaigns ( " .
 				'  campaign_id bigint(20) unsigned NOT NULL auto_increment, ' .
 				'  account_id bigint(20) NOT NULL default "0", ' .
 				'  type varchar(255) NOT NULL default "", ' .

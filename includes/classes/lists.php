@@ -8,46 +8,42 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 /**
  * Lists class.
  */
-class Lists
-{
+class Lists {
 
-	private $tablePrefix;
-	private $tableName;
+	private $prefix;
+	private $table;
 
 	/**
 	 * Construct.
 	 */
-	public function __construct()
-	{
+	public function __construct() {
 		global $wpdb;
 
-		$this->tablePrefix = $wpdb->prefix . 'mailerglueapp_';
-		$this->tableName   = $this->tablePrefix . 'lists';
+		$this->prefix = $wpdb->prefix . 'mailerglueapp_';
+		$this->table  = $this->prefix . 'lists';
 	}
 
 	/**
 	 * Add a list.
 	 */
-	public function addList($args = array())
-	{
+	public function add_list( $args = array() ) {
 		global $wpdb;
 
-		$name = !empty($args['name']) ? $args['name'] : '';
+		$name = ! empty( $args[ 'name' ] ) ? $args[ 'name' ] : '';
 
-		$wpdb->insert($this->tableName, array(
+		$wpdb->insert( $this->table, array(
 			'name'			=> $name,
-			'create_time'	=> current_time('mysql', 1),
-		));
+			'create_time'	=> current_time( 'mysql', 1 ),
+		) );
 	}
 
 	/**
 	 * Remove a list.
 	 */
-	public function removeList($listID = 0)
-	{
+	public function remove_list( $list_id = 0 ) {
 		global $wpdb;
 
-		$wpdb->delete($this->tableName, array('list_id' => $listID));
+		$wpdb->delete( $this->table, array( 'list_id' => $list_id ) );
 	}
 
 }
