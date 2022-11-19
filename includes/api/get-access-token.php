@@ -27,33 +27,35 @@ class GetAccessToken {
 	 * Response.
 	 */
 	public function response( $request ) {
+		$data = array();
 
 		$rest = new \MailerGlueApp\API\Log_Request;
 		$rest->insert( $request );
 
-		$email		= $request->get_param( 'email' );
-		$password	= $request->get_param( 'password' );
+		$headers = $request->get_headers();
 
-		$data = array();
+		$email		= isset( $headers[ 'mailerglue_email' ] ) ? $headers[ 'mailerglue_email' ][0] : '';
+		$password	= isset( $headers[ 'mailerglue_password' ] ) ? $headers[ 'mailerglue_password' ][0] : '';
 
 		$user = new \MailerGlueApp\User;
 
 		$user->set_by_email( $email );
 
 		if ( ! $user->has_id() ) {
-			return new \WP_Error( 'invalid_account', 'This account does not exist.' );
+			return new \WP_Error( 'invalid_account', 'These credentials do not match our records.' );
 		}
 
 		if ( ! $user->check_credentials( $password ) ) {
-			return new \WP_Error( 'incorrect_credentials', 'Your credentials are incorrect.' );
+			return new \WP_Error( 'incorrect_credentials', 'These credentials do not match our records.' );
 		} else {
 
 			$user->set_access_token();
 
 			$data = array(
+				'success'		=> true,
 				'id'			=> $user->get_id(),
 				'email'			=> $user->get_email(),
-				'acess_token'	=> $user->get_access_token(),
+				'access_token'	=> $user->get_access_token(),
 			);
 		}
 
