@@ -26,6 +26,19 @@ class User {
 	/**
 	 * Sets a user by a given email.
 	 */
+	public function set( $user_id = 0 ) {
+
+		$user = get_userdata( $user_id );
+
+		if ( $user && ! empty( $user->ID ) ) {
+			$this->id	 = $user->ID;
+			$this->data	 = $user->data;
+		}
+	}
+
+	/**
+	 * Sets a user by a given email.
+	 */
 	public function set_by_email( $email ) {
 
 		$user = get_user_by( 'email', $email );
@@ -50,6 +63,23 @@ class User {
 	public function get_email() {
 
 		return ! empty( $this->data->user_email ) ? $this->data->user_email : '';
+	}
+
+	/**
+	 * Get user's name.
+	 */
+	public function get_name() {
+
+		$fname = get_user_meta( $this->id, 'first_name', true );
+		$lname = get_user_meta( $this->id, 'last_name', true );
+
+		if ( $fname || $lname ) {
+			$name = $fname . ' ' . $lname;
+		} else {
+			$name = '';
+		}
+
+		return $name;
 	}
 
 	/**
@@ -100,6 +130,30 @@ class User {
 		$this->access_token = $token;
 
 		return $this->access_token;
+	}
+
+	/**
+	 * Validates the user provided token.
+	 */
+	public function validate_token( $provided_token ) {
+
+		$token = get_user_meta( $this->get_id(), '_mailerglue_token', true );
+
+		return $token && $token === $provided_token;
+	}
+
+	/**
+	 * Update account meta.
+	 */
+	public function update_meta( $data ) {
+
+		if ( empty( $data ) || ! is_array( $data ) ) {
+			return;
+		}
+
+		foreach( $data as $key => $value ) {
+			update_user_meta( $this->get_id(), '_mailerglue_' . $key, $value );
+		}
 	}
 
 }

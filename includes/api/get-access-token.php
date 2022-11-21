@@ -55,7 +55,8 @@ class GetAccessToken {
 				'success'		=> true,
 				'id'			=> $user->get_id(),
 				'email'			=> $user->get_email(),
-				'access_token'	=> $user->get_access_token(),
+				'name'			=> $user->get_name(),
+				'token'			=> $user->get_access_token(),
 			);
 		}
 
