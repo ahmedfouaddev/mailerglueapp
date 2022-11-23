@@ -6,17 +6,17 @@ namespace MailerGlueApp\API;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * getAccessToken class.
+ * Verify_Login class.
  */
-class GetAccessToken {
+class Verify_Login {
 
 	/**
 	 * Construct.
 	 */
 	public function __construct() {
 
-		register_rest_route( MAILERGLUEAPP_API_VERSION, '/get_access_token', array(
-			'methods'				=> 'get',
+		register_rest_route( MAILERGLUEAPP_API_VERSION, '/verify_login', array(
+			'methods'				=> 'post',
 			'callback'				=> array( $this, 'response' ),
 			'permission_callback'	=> array( '\MailerGlueApp\API', 'authenticate' ),
 		) );
@@ -65,4 +65,4 @@ class GetAccessToken {
 
 }
 
-return new \MailerGlueApp\API\GetAccessToken;
+return new \MailerGlueApp\API\Verify_Login;
