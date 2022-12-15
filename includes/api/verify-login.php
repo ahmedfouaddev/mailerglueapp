@@ -47,18 +47,17 @@ class Verify_Login {
 
 		if ( ! $user->check_credentials( $password ) ) {
 			return new \WP_Error( 'incorrect_credentials', 'These credentials do not match our records.' );
-		} else {
-
-			$user->set_access_token();
-
-			$data = array(
-				'success'		=> true,
-				'id'			=> $user->get_id(),
-				'email'			=> $user->get_email(),
-				'name'			=> $user->get_name(),
-				'token'			=> $user->get_access_token(),
-			);
 		}
+
+		$user->set_access_token();
+
+		$data = array(
+			'success'		=> true,
+			'id'			=> $user->get_id(),
+			'email'			=> $user->get_email(),
+			'name'			=> $user->get_name(),
+			'token'			=> $user->get_access_token(),
+		);
 
 		return rest_ensure_response( $data );
 	}
