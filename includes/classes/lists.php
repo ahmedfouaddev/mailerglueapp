@@ -1,6 +1,6 @@
 <?php
 
-namespace MailerGlue;
+namespace MailerGlueApp;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;

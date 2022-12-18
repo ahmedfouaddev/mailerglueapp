@@ -143,6 +143,68 @@ class User {
 	}
 
 	/**
+	 * Checks if account is activated.
+	 */
+	public function is_activated() {
+
+		$status = $this->get_account_status();
+
+		return $status === 'verified' ? true : false;
+	}
+
+	/**
+	 * Returns the user's account status.
+	 */
+	public function get_account_status() {
+
+		$status = get_user_meta( $this->get_id(), '_mailerglue_status', true );
+
+		return $status;
+	}
+
+	/**
+	 * Set account ready for activation.
+	 */
+	public function setup_activation() {
+
+		if ( $this->get_activation_code() ) {
+
+			$code = $this->get_activation_code();
+
+			$this->send_activation_email( $code );
+		} else {
+
+			$code = random_int( 100000, 999999 );
+
+			$this->send_activation_email( $code );
+		}
+
+		$this->update_meta( array( 'code' => $code, 'status' => 'unverified' ) );
+
+		return $code;
+	}
+
+	/**
+	 * Set an account as activated.
+	 */
+	public function activate_account() {
+
+		delete_user_meta( $this->get_id(), '_mailerglue_code' );
+
+		update_user_meta( $this->get_id(), '_mailerglue_status', 'verified' );
+	}
+
+	/**
+	 * Get user's activation code.
+	 */
+	public function get_activation_code() {
+
+		$activation_code = get_user_meta( $this->get_id(), '_mailerglue_code', true );
+
+		return $activation_code;
+	}
+
+	/**
 	 * Update account meta.
 	 */
 	public function update_meta( $data ) {
@@ -154,6 +216,35 @@ class User {
 		foreach( $data as $key => $value ) {
 			update_user_meta( $this->get_id(), '_mailerglue_' . $key, $value );
 		}
+	}
+
+	/**
+	 * This sends an email with activation code in it.
+	 */
+	public function send_activation_email( $code = '' ) {
+		if ( empty( $code ) ) {
+			return;
+		}
+
+		$email = new \MailerGlueApp\Email;
+
+		$email->tags( array( 'code' => $code ) );
+		$email->to( $this->get_email() );
+		$email->subject( __( 'Activate your Mailer Glue account', 'mailerglueapp' ) );
+		$email->message( $this->get_email_activation_template() );
+
+		$email->send();
+	}
+
+	/**
+	 * Get email activation template.
+	 */
+	public function get_email_activation_template() {
+		ob_start();
+
+		include_once MAILERGLUEAPP_PLUGIN_DIR . 'includes/emails/email-activation.php';
+
+		return ob_get_clean();
 	}
 
 }
