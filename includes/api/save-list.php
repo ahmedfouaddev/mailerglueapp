@@ -6,16 +6,16 @@ namespace MailerGlueApp\API;
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 /**
- * Save_Basic_Settings class.
+ * Save_List class.
  */
-class Save_Basic_Settings {
+class Save_List {
 
 	/**
 	 * Construct.
 	 */
 	public function __construct() {
 
-		register_rest_route( MAILERGLUEAPP_API_VERSION, '/save_basic_settings', array(
+		register_rest_route( MAILERGLUEAPP_API_VERSION, '/save_list', array(
 			'methods'				=> 'post',
 			'callback'				=> array( $this, 'response' ),
 			'permission_callback'	=> array( '\MailerGlueApp\API', 'authenticate' ),
@@ -47,11 +47,12 @@ class Save_Basic_Settings {
 
 		$data = json_decode( $request->get_body(), true );
 
-		$user->update_meta( $data );
+		$list = new \MailerGlueApp\Lists;
+		$list->update( $data, $account_id );
 
 		return rest_ensure_response( array_merge( array( 'success' => true ), $data ) );
 	}
 
 }
 
-return new \MailerGlueApp\API\Save_Basic_Settings;
+return new \MailerGlueApp\API\Save_List;
