@@ -116,6 +116,12 @@ final class MailerGlueApp {
 
 		$this->install	= new MailerGlueApp\Install();
 		$this->api		= new MailerGlueApp\API();
+		$this->types	= new MailerGlueApp\Types();
+
+		if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+			$this->admin_menus 		= new MailerGlueApp\Admin\Menus;
+			$this->admin_scripts 	= new MailerGlueApp\Admin\Scripts;
+		}
 
 	}
 
