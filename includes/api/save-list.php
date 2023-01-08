@@ -27,7 +27,6 @@ class Save_List {
 	 * Response.
 	 */
 	public function response( $request ) {
-		$data = array();
 
 		$rest = new \MailerGlueApp\API\Log_Request;
 		$rest->insert( $request );
